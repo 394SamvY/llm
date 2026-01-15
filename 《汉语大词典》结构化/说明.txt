@@ -1,0 +1,4 @@
+jsonl是每个词条的信息
+markdown是json键定义
+py文件可以把jsonl转成纯文本
+txt是转换后的示例

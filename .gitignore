@@ -1,0 +1,46 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# ===== IDE =====
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# ===== 项目相关 =====
+.env
+*.log
+logs/
+
+# ===== 数据文件（太大不上传）=====
+data/raw/
+data/processed/*.json
+data/processed/*.pkl
+
+# 大文件（超过GitHub 100MB限制）
+《汉语大词典》结构化/dyhdc.parsed.fixed.v2.jsonl
+《汉语大词典》结构化/原始jsonl及解析程序/dyhdc.jsonl
+音韵数据/中古音/廣韻*.mdd
+
+# ===== Jupyter =====
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ===== 测试 =====
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ===== 构建 =====
+dist/
+build/
+*.egg-info/

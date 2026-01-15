@@ -1,0 +1,30 @@
+# ===== 核心依赖 =====
+# LLM API
+openai>=1.0.0
+anthropic>=0.8.0
+
+# Agent框架（可选，也可以自己实现）
+langchain>=0.1.0
+langchain-openai>=0.0.5
+langchain-anthropic>=0.1.0
+
+# ===== 数据处理 =====
+pandas>=2.0.0
+numpy>=1.24.0
+
+# ===== 向量数据库（可选）=====
+chromadb>=0.4.0
+
+# ===== 工具库 =====
+python-dotenv>=1.0.0
+pyyaml>=6.0
+tqdm>=4.65.0
+rich>=13.0.0  # 美化输出
+
+# ===== 开发工具 =====
+pytest>=7.0.0
+jupyter>=1.0.0
+ipykernel>=6.0.0
+
+# ===== MDX解析（可选）=====
+# readmdict>=0.1.1  # 如果需要解析MDX文件

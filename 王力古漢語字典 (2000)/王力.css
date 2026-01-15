@@ -1,0 +1,405 @@
+/*Mastameta updated 2022.7.26*/
+@font-face {font-family:ZhongHuaSongPlane00; src:url('./ZhongHuaSongPlane00-WL.woff') format('woff'); unicode-range:U+0-FFFD}
+@font-face {font-family:ZhongHuaSongPlane02; src:url('./ZhongHuaSongPlane02-WL.woff') format('woff'); unicode-range:U+20000-2FFFF}
+@font-face {font-family:WL-super; src:url('./WL-super.woff') format('woff')}
+@font-face {font-family:WL-supp; src:url('./WL-supp.woff') format('woff')}
+@font-face {font-family:WL-special; src:url('./WL-special.woff') format('woff')}
+@font-face {font-family:WL-alt; src:url('./WL-alt.woff') format('woff')}
+@font-face {font-family:'Calibri Light'; src:url('./calibril-min.woff') format('woff')}
+@font-face {font-family:Calibri; src:url('./calibri-min.woff') format('woff')}
+
+body {font-family:'Calibri Light', WL-super, ZhongHuaSongPlane02, ZhongHuaSongPlane00, WL-supp; line-height:1.31em}
+alt, reg:not([G]) {font-family:'Calibri Light', WL-alt, WL-super, ZhongHuaSongPlane02, ZhongHuaSongPlane00, WL-supp}
+PUA:not([ZH]):hover {color:red}
+
+a:link, a:visited {display:inline-block; color:currentcolor; text-decoration:none}
+yin a:link {border-bottom:1px solid #f5e5e1}
+p a:link, div[t] a:link {border-bottom:1px solid #eccfc6}
+yin a:link:hover, p a:link:hover, div[t] a:link:hover {color:maroon; border-bottom:1px solid transparent}
+
+/*quotations*/
+z {display:inline-block; color:teal; margin-right:.3em}
+p[n]~p[no]>z {margin-left:.2em}
+z[in] {display:inline}
+/*proper names, titles*/
+u {display:inline-block; text-decoration:none; border-bottom:1px solid #595959; margin:0 .15em .1em 0}
+z u {border-bottom:1px solid #178282}
+i {display:inline-block; font-style:normal; padding-bottom:1px; margin:0 .15em .1em 0;
+	background:url('./wave70.png') 0 100% repeat-x; background-size:auto .1em}
+z i {background:url('./wave-teal70.png') 0 100% repeat-x; background-size:auto .1em}
+u+u, i+i, u+i, i+u {margin:0 .1em .075em}
+i[m0], u[m0] {margin-right:0}
+/*intralinear editorial comments*/
+e {display:inline-block}
+e[x]::before, e[t]::before {content:"引"; display:inline-block; vertical-align:.1em;
+	font-family:sans-serif; font-size:.7em; height:1.3em; line-height:1.3em;
+	border-radius:.2em; background-color:darkolivegreen; color:white; opacity:.8;
+	padding:.1em .175em .1em .2em; margin:0 .3em 0 0}
+e[t]::before {content:""attr(t)""}
+e[t]::after{content:""}
+/*headword occurrences*/
+w::before {content:""attr(w)""}
+w::before {content:"～"; font-family:WL-special}
+/*header, top-right links*/
+tou {display:block; position:relative; margin:0 0 .5em}
+tou~tou {margin:.5em 0}
+tou>hw {display:inline-block; font-size:1.6em; font-weight:normal; margin-top:.15em}
+tou>hw>yt::before, hw>yt::after {content:"〔"; font-size:.8em; opacity:.7; margin-left:.1em}
+tou>hw>yt::after {content:"〕"; margin:0}
+tou>hw>yt>dn {display:inline-block; vertical-align:top; font-size:60%; margin-left:.1em}
+tou>a {display:inline-block; float:right; position:relative; font-size:13px;
+	vertical-align:middle; padding:0 .25em; margin:.05em 0 0 .5em; line-height:1.4em;
+	border-radius:.25em; border:1px solid #f4ece6; background-color:#faf4ef}
+tou>a:hover {color:maroon !important; border:1px solid #f7e9de; background-color:#fdf4ed;
+	transform:scale(1.033); -webkit-transform:scale(1.033); transform-origin:center; color:currentColor}
+tou>a[rs]::after {content:"+"attr(rs)""; font-size:12px; padding-right:.05em; margin-left:.15em}
+tou>a[rs="0"]::after {content:"部"; font-size:inherit; margin-left:0}
+tou>a[pg] {font-size:12px; padding:1px .25em}
+tou>a[pg]::after {content:"頁"; font-size:11px; margin-left:.1em}
+tou[CYZ]>hw, tou[CYZ]>ot, tou[CYZ]>py {display:none; color:red}
+tou[CYZ]>span {display:block; font-size:12px; line-height:1.5em;
+	float:right; vertical-align:middle; padding:0 .25em; margin:.1em .2em 0 .4em;
+	border-radius:.25em; border:1px solid #e6f0e6; background-color:#f5f9f5}
+tou[CYZ]>span:hover {color:black; margin-left:.5em}
+tou[CYZ]>span:hover::before{content:"古漢語"}
+tou[CYZ]>span:hover::after {content:"字典 4e"}
+tou[CYZ]~div[t]::before {background-color:#007500}
+
+yin {clear:both; display:block; margin:0 0 .1em}
+yin[id]::before {content:""attr(id)"."; margin:0 .6em 0 0;
+	font-family:WL-special; font-size:.9em}
+	yin>oy {margin-right:-.2em}
+	yin>gu {margin-left:.55em}
+	yin>oy+gu {margin-left:.3em}
+	yin>gu MC {font-size:; color:#0a335c; margin-right:.5em}
+//	yin>gu>MC>Mf::before {content:" + "attr(abbr)""}
+
+//	gu>my::before {content:"，"}
+//	gu>my::after {content:"韻"}
+	gu>my[tone]::before {content:""attr(tone)""}
+p~yin {margin:.2em 0 .1em}
+
+sub {vertical-align:-.2em; margin-left:.05em}
+/*<p>*/
+p {margin:0}
+p+p, div+p {margin:.1em 0 0}
+yin[id]+p {padding-left:1.25em}
+/*<p n="❶">*/
+p[n] {padding-left:1.25em}
+p[n]::before {content:""attr(n)""; font-family:WL-special, Calibri, sans-serif; font-size:1em; color:#0d590d;
+	padding-right:.25em; margin-left:-1.25em}
+dn {font-family:WL-special, Calibri, sans-serif; font-size:.95em; color:#0d590d; letter-spacing:.1em; margin:0 .1em}
+/*p hao="㊀"*/
+p[hao]::before {content:""attr(hao)""; color:#114511; margin-right:.25em}
+div>p[hao]:first-of-type {margin-top:.1em}
+/*p num="①"*/
+p[num] {display:block; padding-left:1.3em}
+p[num]::before {content:""attr(num)""; font-family:WL-special; font-size:.8em; color:#114511;
+	padding-right:.3em; margin-left:-1.4em}
+yin+p[num], div[t] p[num] {padding-left:1em}
+p[n]~p[num] {padding-left:1.25em}
+
+div[t]>p[num] {display:block; padding-left:1.1em}
+/*phrases*/
+ci {display:inline-block; font-size:1.025em; font-weight:700; color:#344706; margin:.1em .3em 0 0}
+ci::before, ci::after {content:"⦗"; font-family:WL-special; color:#374d00; opacity:.5}
+ci::after {content:"⦘"}
+div ci {margin:0 .1em}
+/*post-definition sections*/
+div[t]::before {content:""attr(t)""; display:inline-block;
+	font-size:.875em; font-weight:bold; vertical-align:.05em;
+	border-radius:.25em; background-color:#864d13; color:white;
+	padding:0 .2em; margin:.1em .4em 0 -.1em}
+div[t] {display:block; margin:.2em 0 0}
+div[t="同源字"][w] a:link {border-bottom:1px solid #f2dfd9; margin-bottom:.05em} /*instead of empty [w0]*/
+div[t] a[w] {font-weight:700; color:#864d13}
+div[t] i, div[t] z {display:inline}
+span[t] {color:#864d13}
+div table {margin-left:auto; margin-right:auto}
+div table td+td {padding-left:.5em}
+
+div[TY]::before {content:"同源字"; display:inline-block; float:left; position:relative;
+	font-size:.875em; font-weight:bold; vertical-align:.05em;
+	border-radius:.25em; background-color:#864d13; background-color:#866913; color:white;
+	padding:0 .2em; margin:0 .3em .1em -.1em}
+div[TY]~div[TY]::before {display:none}
+div[TY] {display:block; margin:.25em 0 0}
+div[TY]>p {padding:0 0 0 3.5em; margin:0; position:relative}
+div[TY]>p::first-of-type {margin:.2em 0 0}
+div[TY]>p>a[pg] {display:inline-block; float:right;
+	font-size:12px; margin:.05em 0 0; vertical-align:middle; line-height:1.3em;
+	padding:1px .25em; border-radius:.25em; border:1px solid #f4ece6; background-color:#faf4ef}
+div[TY]>p>a[pg]::before {content:""attr(pg)""}
+div[TY]>p>a[pg]::after {content:"頁"; font-size:11px; margin-left:.1em}
+div[TY]>p>a[pg]:hover {color:maroon; border:1px solid #f7e9de; background-color:#fdf4ed;
+	transform:scale(1.033); -webkit-transform:scale(1.033); transform-origin:center}
+div[TY]>p>a[pg][shown] {background-color:#f7e9de; color:#733826}
+div[TY] a:link, div[TY] a:visited {border-bottom:1px solid #f2dfd9; margin-bottom:.1em}
+
+ty {display:inline-block; font-family:WL-supp, WL-super, ZhongHuaSongPlane00, ZhongHuaSongPlane02; margin-right:.3em}
+ty[f]::before {content:"-"attr(f)""; display:inline-block; font-family:'Calibri Light';
+	font-size:.9em; font-weight:800; color:#774828; color:#866913;
+	vertical-align:text-top; margin:0 .3em 0 -.2em}
+ty[sub]::before {content:"⮩"; display:inline; color:#774828; opacity:.5; margin-right:.1em}
+ty[sub][f]::before {content:"-"attr(f)""; opacity:1; margin-right:.3em}
+ty>a+a {margin-left:.1em}
+ty>a:link:hover {color:maroon; transform:scale(1.033); -webkit-transform:scale(1.033); transform-origin:center}
+TY>a[w] {font-weight:700; color:#864d13}
+TY>a[ci] {font-weight:700; color:#374d00}
+
+div[TY] leaf {display:none; position:relative; width:auto; height:auto; max-width:32em; cursor:n-resize;
+	padding:0 .5em .5em; margin:.5em 1em .5em -.6em; overflow:hidden; transition:1s ease-in;
+	border-radius:.4em; border-top:.1em dashed #f2ebd9; border-bottom:.1em dashed #f2ebd9}
+div[TY] leaf img {margin-top:-2.25em; width:100%; height:auto}
+@media (max-width:37.5em) {
+	div[TY]>p {padding:0}
+	ty[f]::before {margin:0 .3em 0 .1em}
+	div[TY] leaf {padding:0 0 .3em; margin:.5em auto .4em}
+}
+div[TY="pic"]::before {display:none}
+div[TY="pic"] span:empty {display:none}
+div[TY="pic"]>p {padding:0 0 0 .8em; margin:0}
+div[TY="pic"] ty {font-size:1.1em}
+div[TY="pic"] ty>a+a {margin-left:.15em}
+div[TY="pic"] leaf {display:block; padding:.4em .8em 0; margin:.3em 0 0; max-width:33em; transition:0; cursor:default;
+	border:1px solid #f5ece0; background-color:#fbf3e9}
+div[TY="pic"] leaf img {margin:0}
+@media (max-width:35em) {
+	div[TY="pic"] leaf {display:block; padding:1% 1% 1.5%; margin-top:.3em 0 0; max-width:98%; background-color:linen}
+}
+@media (pointer:coarse) {
+	div[TY]>p:last-of-type leaf {margin-bottom:0}
+	div[TY="pic"]>p {padding:0; margin:0; line-height:1.1em}
+	div[TY="pic"] ty {font-size:.9em}
+	div[TY="pic"] leaf {display:block; padding:0; margin:.5em 0 0; border:none; background:none}
+	div[TY="pic"] leaf img {margin:0}
+}
+/*Kangxi radicals table*/
+a[Kn] {display:inline-block; position:relative; float:left; clear:left;
+	font-family:'Calibri Light'; color:#3d8f87; margin-right:.4em; padding:0 0 .1em; opacity:.8}
+a[Kn]:hover {color:#1f4743; opacity:1; cursor:help}
+a[Kn="1"]:hover~#Kx>a:not([n="1"]), a[Kn="2"]:hover~#Kx>a:not([n="2"]), a[Kn="3"]:hover~#Kx>a:not([n="3"]), a[Kn="4"]:hover~#Kx>a:not([n="4"]), a[Kn="5"]:hover~#Kx>a:not([n="5"]), a[Kn="6"]:hover~#Kx>a:not([n="6"]), a[Kn="7"]:hover~#Kx>a:not([n="7"]), a[Kn="8"]:hover~#Kx>a:not([n="8"]), a[Kn="9"]:hover~#Kx>a:not([n="9"]), a[Kn="10"]:hover~#Kx>a:not([n="10"]), a[Kn="11"]:hover~#Kx>a:not([n="11"]), a[Kn="12"]:hover~#Kx>a:not([n="12"]), a[Kn="13"]:hover~#Kx>a:not([n="13"]), a[Kn="14"]:hover~#Kx>a:not([n="14"]), a[Kn="15"]:hover~#Kx>a:not([n="15"]), a[Kn="16"]:hover~#Kx>a:not([n="16"]), a[Kn="17"]:hover~#Kx>a:not([n="17"]) {opacity:0}
+a[Kn]:hover~#Kx>a[n] {transform:scale(1.075); -webkit-transform:scale(1.075); transition:0 ease-out}
+a[Kn]:hover~#Kx>a[n]::before {transform-origin:70% 70%; transform:scale(.8); -webkit-transform:scale(.8); color:#008073; vertical-align:.05em}
+#Kx {clear:right; display:flex; flex-flow:row wrap; line-height:.7em; max-width:23em}
+#Kx>a {display:inline-block; border:1px solid transparent; padding:.15em .1em; margin:0 .05em 0; cursor:default}
+#Kx>a::before {content:""attr(p)""; display:inline-block; vertical-align:.1em; margin-right:.075em}
+#Kx>a:hover, #WLpy a:hover {transform:scale(1.025); -webkit-transform:scale(1.025); transform-origin:center}
+#Kx>a:hover {border-radius:.2em; border:1px solid #f4f4af; background-color:#fafad1;
+	box-shadow:2px 2px .1em #e6e6b3; color:#06232d}
+@media (max-width:26em) {
+	a[Kn] {font-size:.85em; margin:0 .2em 0 -.1em}
+	#Kx>a {margin:0}
+	#Kx>a[opt]::before {display:none}
+	}
+/*radical page:header*/
+#KSum>a[KSum]::after {content:"部：總論"}
+#KSum>a[KSum]:hover {border:1px solid #f7e9de}
+#KSum p {font-size:.1.1em; line-height:1.3em}
+#KSum>p[hao], #KSum>p[no] {padding-left:1.5em; margin-bottom:.05em}
+#KSum>p[hao]::before, #KSum>p[no]::before {content:""attr(hao)""; color:currentColor; padding-right:.2em; margin-left:-1.5em}
+#KSum>p[no]::before {content:""attr(no)"."; margin-right:.1em}
+#KSum span[no]::before {content:""attr(no)"."; margin-right:.2em}
+#KSum span[no] {display:block}
+#KSum a {border-bottom:1px solid #f3ded8}
+#KSum space>a+a {margin-left:.35em}
+#KSum comma>a+a {margin-left:-.1em}
+#KSum>p a:hover {border-bottom:1px solid transparent}
+#KSum>p a:not([href]) {border:none}
+/*Ks: radical-chars sorted by stroke count*/
+#Ks>Kx, #Kf>Kx, a[KSum] {display:inline-block; padding:.05em .2em; margin:0 .3em .3em 0;
+	border-radius:.2em; border:1px solid #f5dcdd; background-color:antiquewhite}
+#Ks>Kx::after, #Kf>Kx::after {content:"部：筆畫"}
+#Kf>Kx::after {content:"部：韻母"}
+#Ks>rs>a, #Kf>pf>a {font-size:1.1em; line-height:1.35em; margin-right:.175em}
+#Ks>rs:not([s="0"])::before {content:"+"attr(s)""; font-size:.8em; font-weight:700; color:saddlebrown;
+	display:inline-block; vertical-align:.15em; margin:0 .25em 0 -.1em}
+#Ks>rs>a:link {border:none; margin-right:.15em}
+#Ks>rs>a[p]:hover::before, pK>a[p]:hover::before, pf>a[p]:hover::before {
+	content:""attr(p)""; z-index:2; pointer-events:none;
+	position:absolute; margin-top:-1.8em; margin-left:-.2em;
+	font-family:Calibri; font-size:.8em; color:black;
+	min-width:1em; text-align:center;
+	border-radius:.25em; padding:0 .2em;
+	border:1px solid #f8edd8; background-color:oldlace; box-shadow:.1em .1em .1em #e6d3b3}
+pf>a[MC]:hover::before {content:""attr(MC)""; border:1px solid #d7e7f9; background-color:#e9f2fc; box-shadow:.1em .1em .1em #a6c8f2}
+/*words grouped under finals*/
+pf {display:inline-block}
+pf a:last-child {margin-right:.25em}
+pf[f]::before {content:"-"attr(f)""; font-size:.9em; font-weight:800; color:saddlebrown;
+	display:inline-block; vertical-align:text-bottom; margin:0 .2em 0 .1em}
+/*pinyin index*/
+#WLpy {display:block; font-size:1em; line-height:1.1em; columns:2}
+#WLpy>span {display:inline}
+#WLpy a {display:inline-block; vertical-align:text-top; padding:0 0 .05em .2em; margin-right:.2em; cursor:default}
+#WLpy a:last-child::after {content:"."}
+#WLpy a:first-of-type::first-letter {text-transform:uppercase; font-family:Calibri; font-weight:700; color:saddlebrown}
+#WLpy a:hover {transform:scale(1.025); -webkit-transform:scale(1.025); transform-origin:center;
+	color:#4d0500; box-shadow:2px 2px .1em #f2c5c0;
+	border-radius:.2em; background-color:#ffeceb}
+#WLpy a:hover::after {opacity:0}
+@media (max-width:24em) {#WLpy {columns:1; max-width:15em}}
+/*pN: pinyin index arranged by tone*/
+#pyN {display:block; border-bottom:1px solid #fbf4f4}
+pyN {display:block; margin:0 0 .5em 0}
+pyN>py[id]::before {content:""attr(id)""; font-family:WL-special; font-size:.85em; padding-right:.5em}
+pyN>py, #pKx>py {display:inline-block; position:relative; float:left;
+	font-family:'Calibri Light', ZhongHuaSongPlane00; font-size:.9em;
+	padding:0 .3em 0 .25em; margin-right:.5em;
+	border-radius:.2em; border:1px solid #f6dfe0; background-color:antiquewhite}
+pn {display:flex; flex-flow:row wrap; clear:right}
+pn>a, pK>a:not([K]) {font-size:1.1em; line-height:1.25em; margin-right:.175em}
+pn>a::after {content:""attr(n)""attr(tag)""; font-family:'Calibri Light', WL-special;
+	font-size:.7em; color:#432609; color:saddlebrown;
+	vertical-align:.2em; margin-left:.03em}
+pn>a[n="0"]::after, pn>a[n="1"]::after {content:""attr(tag)""}
+pn>a[tag]::after {margin-right:.05em}
+/*pK: pinyin index arranged by radical*/
+#pKx {display:block; margin-top:.5em}
+#pKx>py {float:none; margin:0 0 .4em}
+#pKx>py::before {content:""attr(p)""; font-size:1.075em}
+#pKx>py::after {content:" : 部首"; margin-left:-.15em}
+pKx {display:block}
+pK>a[K] {font-family:WL-special, sans-serif; font-size:.85em; color:saddlebrown; margin:0 .3em 0 0}
+pK>a[K]:hover {color:#990012}
+
+bar>a {display:block; text-align:center; vertical-align:middle;
+	border-radius:.2em; border:1px solid transparent; cursor:default}
+bar>a[href$="WLK"], bar>a[p$="K"], bar[top]>a {color:white; background-color:#367d76; padding:.1em; cursor:pointer}
+bar>a[href$="WLK"], bar[top]>a {background-color:#1f5c55}
+bar>a[href$="WLK"]::before {content:"部首"}
+bar>a:hover {transform:scale(1.03); -webkit-transform:scale(1.03); transform-origin:center}
+
+book {width:auto; max-width:100%; padding:.3em .3em .5em .7em; overflow:hidden}
+book img {width:100%; height:auto}
+book {display:flex; flex-flow:column nowrap; position:relative; align-items:center;
+	border-radius:.4em; border:1px solid #f5ece0; background-color:#fbf3e9;
+	width:98%; padding:.3em .3em .6em .7em}
+c0, c1, c2 {display:block; width:100%; overflow:hidden}
+c2 {display:none}
+bar {display:flex; flex-flow:row nowrap; justify-content:start; align-items:center; width:100%; height:auto; margin:-.1em 0 .4em}
+bar>a {font-weight:600; vertical-align:middle}
+bar>a[href$="WLK"], bar[top]>a {padding:.05em .2em; margin:0 .25em 0 0}
+bar>a[p$="K"] {padding:.05em .15em; margin:.05em .2em .05em 0}
+bar>a[p$="K"]~a[p$="K"] {margin-left:.3em}
+bar>a[K$="w"] {font-size:1.4em; font-weight:normal; margin:0 .1em 0 0}
+
+@media (max-width:45em) {
+	bar {float:left; position:relative; flex-flow:column nowrap; align-items:center; width:auto; height:auto; margin:0 .4em 0 -.1em}
+	bar>a {width:1.2em}
+	bar>a[href$="WLK"] {padding:.05em .1em; margin:.1em}
+	bar>a[p$="K"], bar[top]>a {padding:0 .05em; margin:.1em .15em .35em}
+	bar>a[p$="K"]~a[p$="K"] {margin:.1em .15em .4em}
+	bar>a[K$="w"] {font-size:1.3em; margin:0 0 .2em}
+
+	book {max-width:24em; padding:.4em .7em .4em .4em; margin:-.3em 0 0; clear:right}
+	book img {width:200%}
+	c1, c2 {width:100%; display:inline-block; padding:0 0 .5em}
+/*	c1>img {margin:-10% 0 -1% 1%}
+	c2>img {margin:-10% 0 -1% 1%}*/
+	c1>img {margin:-9.5% 0 0 1%}
+	c2>img {margin:-9.5% 0 0 -99%}
+	book[seam] {border-radius:.4em 0 .4em 0}
+	book[seam]>c1::before {content:""; position:absolute; top:0; right:1px;
+		height:50%; border-left:3px dotted sienna; z-index:2}
+	book[seam]>c2::before {content:""; position:absolute; bottom:0; left:1px;
+		height:50%; border-right:3px dotted sienna; z-index:2}
+}
+@media (max-width:29.5em) {
+	bar {flex-flow:row wrap; float:left; position:relative; justify-content:start; align-items:center; width:100%; height:auto; margin:0 0 .3em}
+	bar>a {width:auto; vertical-align:middle; font-size:.9em}
+	bar>a[href$="WLK"] {display:none}
+	bar>a[p$="K"] {padding:0 .15em; margin:0 .25em 0 0}
+	bar>a[p$="K"]~a[p$="K"] {margin:0 .25em 0 .2em}
+	bar>a[K$="w"] {font-size:1.1em; margin:0 .05em}
+}
+@media (pointer:coarse) {
+	yin {font-family:'Calibri Light', WL-supp, WL-super, ZhongHuaSongPlane00, ZhongHuaSongPlane02}
+	book {width:99.5%; padding:.5em .1em; margin:.3em 0 0 -.1em; border:none; background-color:initial; clear:right; overflow:hidden}
+	book img {width:200%; pointer-events:none}
+	c1, c2 {width:99%; display:inline-block; padding:0 0 .5em}
+	c1>img {margin:-9% 0 -1% 1%}
+	c2>img {margin:-9% 0 0 -101%}
+	bar {flex-flow:row wrap; float:left; position:relative; justify-content:start; align-items:center; width:100%; height:auto; margin:0}
+	bar>a {width:auto; vertical-align:middle; font-size:.9em}
+	bar>a[href$="WLK"] {display:none}
+	bar>a[p$="K"] {padding:0 .15em; margin:0 .25em 0 0}
+	bar>a[p$="K"]~a[p$="K"] {margin:0 .25em 0 .2em}
+	bar>a[K$="w"] {font-size:1em; margin:0 .05em}
+}
+bar[top] {display:flex; flex-flow:row nowrap; justify-content:start; width:100%; height:auto; margin:-.1em 0 .3em}
+bar[top]>a {width:auto; padding:0 .1em; margin:0 .25em 0 0}
+book[full] {width:94%; max-width:32em; padding:1% 3% 3%; margin:0}
+book[full]>c1, book[full] img {width:100%; max-width:100%; height:auto; margin:0; pointer-events:auto}
+a[nav]::before {content:""; display:inline-block; position:absolute; top:0; left:0; width:6em; height:100%; opacity:0; overflow:hidden; border-radius:.4em; background-image:linear-gradient(to right,sienna,transparent)}
+a[nav="rt"]::before {left:auto; right:0; background-image:linear-gradient(to left,sienna,transparent)}
+a[nav]:hover::before, a[nav]:active::before {opacity:.1; transition:opacity 200ms ease-in-out}
+@media (max-width:50em) {a[nav]::before {width:5em}}
+/*fn: finals for Old Chinese*/
+table[fn] {font-size:.9em; text-align:center; vertical-align:top; line-height:1em; border-collapse:collapse; border-spacing:0; margin:0 0 .5em}
+table[fn] th {font-weight:normal; font-size:.95em; min-width:1.45em; border:1px solid #f1e2d0; background-color:linen; padding:.2em .25em .15em}
+table[fn] th[header] {border-radius:.2em; width:1em; line-height:1.3em; padding:.1em}
+th[c1], td[c1] {border-radius:.25em 0 0 0} th[c2], td[c2] {border-radius:0 .25em 0 0} th[c3], td[c3] {border-radius:0 0 .25em 0} th[c4], td[c4] {border-radius:0 0 0 .25em}
+table[fn] td {white-space:nowrap;
+	padding:.2em .2em .15em .05em; border:1px solid #f1e2d0; background-color:#fffcf5}
+table[fn] td[this] {border-radius:.2em; border:.1em solid #841617; background-color:#fbe6df}
+table[fn] td[equiv] {background-color:#fbe6df}
+table[fn="OC-WL"] td:not(:empty)::before {content:""attr(yn)""; font-family:WL-supp, sans-serif;
+	font-size:.6em; color:saddlebrown; padding-left:.3em; padding-right:.4em}
+table[fn] th div {font-size:.9em; margin-top:.3em}
+table[fn] td div {font-size:.9em; margin-top:.1em}
+div[fn="OC-WL"]>span {display:inline-block; font-size:.95em; line-height:1.35em; padding:.05em .2em; margin:0 0 .25em;
+	border-radius:.2em; border:1px solid #f1e2d0; background-color:linen;}
+/*Baxter Old Chinese*/
+table[fn="OC-BS"] {float:left; margin-right:.4em}
+table[fn="OC-BS"] th>span, td[OC]>span, td[Gl]>span {margin-right:.1em}
+table[rel="BS-WL"] {width:auto; font-size:.85em; line-height:.95em; margin:0 .4em .3em 0; float:left;
+	border-radius:.25em; border:1px solid #fbe3db; background-color:#fff4f0; padding:.1em .1em .15em}
+table[rel="BS-WL"] [BSf] {color:#841617}
+table[rel="BS-WL"] [rel] {padding-left:.1em}
+table[words="BS"] {font-family:Calibri, ZhongHuaSongPlane00, ZhongHuaSongPlane02, WL-supp, sans-serif;
+	font-size:1em; line-height:.9em; white-space:nowrap; overflow:hidden; clear:right}
+/*Baxter Old Chinese for headwords*/
+table[hw="BS"] tr:not(:first-of-type) td[W] {visibility:hidden}
+table[hw="BS"] td:first-of-type {font-family:ZhongHuaSongPlane00, ZhongHuaSongPlane02, WL-supp, serif; font-size:1em}
+table[hw="BS"] td[py] {font-family:'Calibri Light'; text-align:right; padding:0 .25em 0 .15em}
+table[hw="BS"] td[MC] {display:none; color:#002db3; text-align:right; padding:0 .25em}
+
+td[mi] {color:#002db3; text-align:right}
+td[mf] {color:#002db3; text-align:left; padding-right:.3em}
+td[mf]::before {content:"+"; display:inline-block; font-size:.9em; opacity:.6; vertical-align:.1em; margin:0 .25em 0 .1em}
+table[BS="fn"] td[mi], [BS="fn"] td[mf] {display:none}
+td[mi], td[mf], td[OC] {font-size:.85em}
+
+td[OC] {color:#841617}
+td[OC] a {margin-bottom:.2em}
+td[OC] a::after {content:""; display:inline-block; position:absolute; margin-top:1.1em; margin-left:-1.3em;
+	border-bottom:1px solid #eccfc6; width:1.3em; height:1px}
+td[Gl] {font-size:.93em; padding-left:.2em}
+td[Gl]>div {color:#841617; display:inline; padding-right:.3em}
+table[hw="BS"] td[Gl] {font-family:sans-serif; font-size:.85em; padding-left:.3em}
+
+@media (max-width:31em) {
+	table[fn="OC-WL"] td::before {display:none}
+	table[fn="OC-WL"] td {min-width:1.65em}
+	table[fn="OC-BS"] {float:none}
+	table[rel="BS-WL"] {display:none}
+}
+@media (max-width:25em) {
+	table[fn] th {display:none}
+	table[fn="OC-WL"] td {min-width:1.7em; padding:.2em}
+	table[fn="OC-WL"] tr:first-child td:first-of-type {border-radius:.2em 0 0 0}
+	table[fn="OC-WL"] tr:last-child td:first-of-type {border-radius:0 0 0 .2em}
+	table[fn="OC-BS"] tr:first-of-type {display:none}
+	table[fn="OC-BS"] tr:nth-child(2) td:nth-child(2) {border-radius:.2em 0 0 0} [OCf="BS"] tr:nth-child(2) td:last-of-type {border-radius:0 .2em 0 0}
+	table[fn="OC-BS"] tr:last-child td:nth-child(2) {border-radius:0 0 0 .2em} [OCf="BS"] tr:last-child td:last-of-type {border-radius:0 0 .2em 0}
+	table[words="BS"] td {font-size:.925em}
+	table[words="BS"] td[Gl] {font-size:.85em}
+}
+@media (max-width:22em), (pointer:coarse) {
+	table[words="BS"] {font-size:smaller}
+}
+
+//book img, leaf img {filter:invert(100%)}
+//yin>gu>MC {display:none}
+//a[pg] {pointer-events:none}

@@ -1,0 +1,157 @@
+@font-face {font-family:'Calibri'; src:local('Calibri') url(calibri.ttf), url('./calibri-min.woff') format('woff'); unicode-range:U+0021-3007}
+@font-face {font-family:FSung-p; src:url('./FSung-p.ttf'), local(FSung-p) url('FSung-p.ttf'); unicode-range:U+0-FFFD}
+@font-face {font-family:FSung-1; src:url('./FSung-1.ttf'), local(FSung-1) url('FSung-1.ttf'); unicode-range:U+10000-1FFFF}
+@font-face {font-family:FSung-2; src:url('./FSung-2.ttf'), local(FSung-2) url('FSung-2.ttf'); unicode-range:U+20000-2FFFF}
+@font-face {font-family:FSung-3; src:url('./FSung-3.ttf'), local(FSung-3) url('FSung-3.ttf'); unicode-range:U+30000-3FFFF}
+@font-face {font-family:FSung-F; src:url('./FSung-F.ttf'), local(FSung-3) url('FSung-F.ttf'); unicode-range:U+F0000-FFFFF}
+@font-face {font-family:FSung-X; src:url('./FSung-X.ttf'), local(FSung-3) url('FSung-X.ttf'); unicode-range:U+100000-10FFFF}
+
+body {font-family:FSung-p, FSung-2, FSung-3, FSung-F, FSung-X, TH-Feon, serif; line-height:1.3em}
+a:link, a:visited {text-decoration:none; border-bottom:1px solid transparent; color:currentColor}
+a:link[sup], a:visited[sup] {color:olive}
+PUA {font-family:FSung-F, FSung-X; color:maroon}
+
+div {vertical-align:middle; margin:0}
+div~div {border-top:1px solid #e0e0eb; padding:.4em 0 0; margin:.3em 0 0}
+div[id*="mdx_iframe_bottom_element"] {padding:0; margin:0; border:none; display:none}
+
+div>t, div>my {font-size:.95em}
+div sub, div pg, div no {font-family:serif}
+div sub {font-size:.7em; vertical-align:-.1em; margin:0 .4em 0 .125em}
+
+div>a, p>span>a {display:inline-block; font-family:serif; font-size:.8em; line-height:1.2em; height:1.2em;
+	padding:0 .25em; margin:.05em 0 0 .4em;
+	border-radius:.25em; border:1px solid #e9e9f1; background-color:#f0f0fa}
+div>a[jiao], span>a[jiao] {color:black; border:1px solid #ede3e3; background-color:#f9f0f0; margin-left:.3em}
+div>a[jiao]::before, span>a[jiao]::before {content:"校勘"; font-family:inherit; font-size:.9em; margin-right:.25em}
+div>a[shown], div>a[shown]>no::after {color:white; border:1px solid transparent; background-color:darkblue}
+div>a[shown][jiao], span>a[shown][jiao] {color:white; border:1px solid transparent; background-color:#8a0000}
+
+div>a>no[sup]::after {content:"補遺"; font-size:.95em; color:purple; margin:0 0 0 .15em}
+div>a>no[sup="new"]::after {content:"增補"}
+div>a:link>no::before {content:"."; margin:0 .075em}
+div>a[e] {font-size:.8em; padding:0 .1em; border:1px solid #ebeeef; background-color:#f4f5f6; margin-left:.3em}
+div>a[e]+a[e] {margin-left:.2em}
+div>a[e]::before {content:""attr(e)""; font-size:.9em}
+div>a[e]>no::before {content:""; margin-left:.2em}
+div>a[e="張"]>no {display:none}
+div>span {display:inline-block; margin:0 0 0 .3em}
+div>span>img {height:1.3em; margin:0 .1em -.4em}
+
+div>go {font-family:serif; color:#003300; float:right; opacity:.6}
+div>go>xn::before {content:""attr(n)""; font-size:.7em}
+div>go>a::before {content:"‹"; display:inline-block; text-align:right; width:1em; padding:0 .1em}
+div>go>a:nth-child(3)::before {content:"›"; text-align:left}
+div>go>a:hover::before {content:"«"}
+div>go>a:nth-child(3):hover::before {content:"»"}
+div>go>a:hover {color:darkgreen; font-weight:bold; opacity:1}
+
+tou {display:inline-block; font-size:1.25em; color:blue; margin:.1em .3em 0 0}
+tou[c] {color:#0059b3; margin:.3em 0 0 .6em}
+tou:not([c])~tou[c] {margin:.3em 0 0}
+
+tou a+a {margin-left:.1em}
+tou a:link {border-bottom:1px solid #c2c2ff}
+tou a:link:hover {border-bottom:1px solid blue}
+p[c] {margin-left:.5em}
+p[child]::before {content:"‧"; margin:0 0 0 .2em; color:#0059b3; opacity:.5}
+
+/*‧description of actual graph when Unicode unsuitable: IDS, PUA, CMP (Compatibility, err (error)*/
+wd::before, wd::after {content:"（"; font-size:.85em}
+wd::after {content:"）"}
+wd[PUA], wd[IDS] {color:maroon}
+wd[err] {color:#78543a}
+wd[err]::before {content:"［"}
+wd[err]::after {content:"］"}
+wd[inc]::before {content:""}
+wd[inc]::after {content:"∈"; display:inline-block; font-weight:bold; opacity:.7; vertical-align:middle; margin:0 .1em}
+
+/*headwords*/
+hw[n]::after {content:""attr(n)"/"attr(t)""; display:inline-block; font-family:serif; color:darkblue;
+	font-size:.55em; opacity:.6; vertical-align:.2em; margin-left:.4em}
+hw[sup], hw[sup]~yt, hw[sup]~vt {color:#4d4d4d}
+/*異體 added*/
+yt::before, yt::after, vt::before, vt::after {font-size:.85em; opacity:.8; margin:0 -.05em}
+yt::before, yt::after {content:"（"}
+yt::after {content:"）"}
+/*variants cited in definition：也作、俗作、本作、說文作、篆文作*/
+vt::before, vt::after {content:"〔"}
+vt::after {content:"〕"}
+
+fq {font-size:}
+MC {display:inline; font-family:serif; font-size:; margin:0 0 0 .3em}
+MC>Mi::before, MC>Mf::after {content:""attr(i)"母"; color:#304805; font-size:.7em; margin:0 .4em}
+MC>Mf::after {content:""attr(d)"等"; margin-right:.5em}
+MC>Mf[d="三四"]::after {content:"三等 ‧ 重紐四等"; margin-right:.6em}
+MC>Mi::after {content:"+"; font-size:.8em; opacity:.8; margin:0 .1em}
+MC>Mf::before {content:""attr(abbr)""}
+MC>Mf>small {vertical-align:.05em; margin-left:.4em}
+MC>Mf>small::before, MC>Mf>small::after {content:"("; opacity:.7}
+MC>Mf>small::after {content:")"}
+MC>Mi[i="莊"]:hover::before {content:"照二"}
+MC>Mi[i="章"]:hover::before {content:"照三"}
+MC>Mi[i="初"]:hover::before {content:"穿二"}
+MC>Mi[i="昌"]:hover::before {content:"穿三"}
+MC>Mi[i="崇"]:hover::before {content:"牀二"}
+MC>Mi[i="船"]:hover::before {content:"牀三"}
+MC>Mi[i="生"]:hover::before {content:"審二"}
+MC>Mi[i="書"]:hover::before {content:"審三"}
+MC>Mi[i="云"]:hover::before {content:"喻三"}
+MC>Mi[i="以"]:hover::before {content:"喻四"}
+MC>Mi[i="俟"]:hover::before {content:"禪二"}
+MC>Mi[i="非"]::before {content:"幫|非"}
+MC>Mi[i="敷"]::before {content:"滂|敷"}
+MC>Mi[i="奉"]::before {content:"並|奉"}
+MC>Mi[i="微"]::before {content:"明|微"}
+MC>Mi[g]::before {content:""attr(i)"|"attr(g)""}
+
+xy {display:inline-block; color:#003300; margin:.1em 0}
+xy::before {content:"⭘"; display:inline; font-size:70%; vertical-align:middle; margin-right:.1em}
+xy>a, xy>a:link {display:inline; vertical-align:middle; padding:.05em .025em 0; color:#003300}
+xy>a:link:hover {border-bottom:1px solid currentColor}
+xy>a[this] {border-radius:.1em; border:1px solid #deebbc; background-color:#f3ffcc}
+xy>a[this][sup] {color:currentColor}
+
+jiao {color:#864d13}
+jiao::before {content:"校記"; display:inline-block;
+	font-size:.8em; font-weight:bold;
+	border-radius:.25em; background-color:#864d13; color:white;
+	padding:0 .25em; margin:.1em .4em 0 -.1em}
+jiao a:link, jiao>a:visited {border-bottom:1px solid #decdba}
+p>span>a[jiao] {margin-right:1em}
+
+p {margin:.1em 0 0}
+p[c] {display:inline; font-size:.95em}
+p[sup] {color:#4d4d4d}
+p[child] {margin-left:-.2em}
+e {font-family:serif, FSung-p, FSung-2, FSung-3, FSung-F, FSung-X}
+e::before, e::after {content:"{"; opacity:.7; margin:0 .05em}
+e::after {content:"}"}
+e>v::before {content:"/"; opacity:.7; margin:0 .1em}
+p>z {color:teal; font-size:.9em; line-height:1.25em}
+p>z::before {content:"註"; display:inline-block; font-family:ZhongHuaSongPlane00; font-size:.85em; font-weight:bold;
+	vertical-align:middle; line-height:1.275em; margin:auto .4em auto 0;
+	border-radius:.15em; border:1px solid #a9d6d6; background-color:#f4fafb; color:#067979; padding:0 .15em}
+
+leaf, book {display:none; width:100%; max-width:32em; height:auto; position:relative;
+	padding:.1em; margin:.3em 0 0; overflow:hidden; border-radius:.3em; cursor:n-resize}
+leaf[jiao], book[jiao] {max-width:36em}
+book {display:block; cursor:default}
+leaf img, book img {width:100%; height:auto; overflow:hidden}
+
+bar {display:flex; flex-flow:row nowrap; max-width:32em;
+	direction:rtl; justify-content:start; align-items:center;
+	width:100%; height:auto; margin:0 0 .3em}
+
+bar>span> {display:flex; flex-flow:row wrap; align-items:center; width:100%}
+bar>span>a {display:inline-block; font-size:1.1em; line-height:1.15em;
+	border-radius:.15em; margin:0 .05em}
+bar>span>a[x]::before {content:"‧"; font-size:80%; font-weight:bold; color:#003300; opacity:.35; vertical-align:.2em; margin:0 -.2em 0 -.1em}
+bar>span>a[y]::before {content:"●"; font-size:80%; margin:0 .2em}
+bar>span>a:link:hover {color:darkblue}
+
+a[nav]::before {content:""; display:inline-block; position:absolute; top:0; left:0;
+	width:6em; height:100%; opacity:0; overflow:hidden; z-index:2;
+	background-image:linear-gradient(to right,gold,transparent); border-radius:.4em}
+a[nav="rt"]::before {left:auto; right:0; background-image:linear-gradient(to left,gold,transparent)}
+a[nav]:hover::before, a[nav]:active::before {opacity:.1; transition:opacity 200ms ease-in-out}
