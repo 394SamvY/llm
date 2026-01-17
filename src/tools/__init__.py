@@ -10,7 +10,7 @@
 """
 
 from .semantic_tool import query_word_meaning, SemanticTool
-from .phonology_tool import query_phonology, PhonologyTool
+from .phonology_tool import query_phonology, PhonologyTool, check_phonetic_relation
 from .textual_tool import search_textual_evidence, TextualTool
 from .pattern_tool import identify_pattern, PatternTool
 from .context_tool import analyze_context, ContextTool
@@ -18,7 +18,8 @@ from .context_tool import analyze_context, ContextTool
 __all__ = [
     # 函数式接口
     "query_word_meaning",
-    "query_phonology", 
+    "query_phonology",
+    "check_phonetic_relation",
     "search_textual_evidence",
     "identify_pattern",
     "analyze_context",
