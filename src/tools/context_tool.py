@@ -4,6 +4,7 @@
 功能：判断将被释字/释字的本义代入原句后是否通顺
 实现：调用LLM进行语义分析
 """
+import json
 from typing import Dict, Optional, Any
 from dataclasses import dataclass
 
@@ -37,14 +38,41 @@ class ContextTool:
         print(result.conclusion)  # "支持假借"
     """
     
-    def __init__(self, llm_client=None):
+    def __init__(self, llm_client=None, auto_init=False):
         """
         初始化工具
         
         Args:
             llm_client: LLM客户端（OpenAI/Anthropic），如果不提供则使用模拟
+            auto_init: 如果为True且llm_client为None，尝试从配置自动创建客户端
         """
+        if llm_client is None and auto_init:
+            llm_client = self._create_client_from_config()
         self.llm_client = llm_client
+    
+    def _create_client_from_config(self):
+        """从配置创建LLM客户端"""
+        try:
+            from openai import OpenAI
+            from ..config import get_settings
+            
+            settings = get_settings()
+            
+            # 优先使用环境变量或配置
+            api_key = settings.openai_api_key or "sk-0d73949767524be2989b35415d2ccbe0"
+            base_url = settings.openai_base_url or "https://api.tokenpony.cn/v1"
+            model = settings.llm_model or "qwen3-coder-480b"
+            
+            client = OpenAI(
+                base_url=base_url,
+                api_key=api_key
+            )
+            # 保存模型名称
+            client._model = model
+            return client
+        except Exception as e:
+            print(f"⚠️  无法创建LLM客户端: {e}")
+            return None
     
     def analyze(
         self,
@@ -86,24 +114,90 @@ class ContextTool:
     ) -> ContextAnalysis:
         """
         使用LLM进行分析
-        
-        TODO: 实现此方法
         """
         prompt = self._build_prompt(
             original_sentence, char_a, char_b, meaning_a, meaning_b
         )
         
-        # ===== TODO: 调用LLM =====
-        # response = self.llm_client.chat.completions.create(
-        #     model="gpt-4-turbo",
-        #     messages=[{"role": "user", "content": prompt}]
-        # )
-        # return self._parse_response(response.choices[0].message.content)
-        
-        # 临时返回模拟结果
-        return self._analyze_mock(
-            original_sentence, char_a, char_b, meaning_a, meaning_b
-        )
+        try:
+            # 调用LLM
+            response = self.llm_client.chat.completions.create(
+                model=getattr(self.llm_client, '_model', 'qwen3-coder-480b'),
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3,
+                max_tokens=500
+            )
+            
+            # 解析响应
+            content = response.choices[0].message.content
+            return self._parse_response(content, original_sentence, char_a, char_b, meaning_a, meaning_b)
+            
+        except Exception as e:
+            # 如果LLM调用失败，回退到mock
+            print(f"⚠️  LLM调用失败: {e}，使用模拟结果")
+            return self._analyze_mock(
+                original_sentence, char_a, char_b, meaning_a, meaning_b
+            )
+    
+    def _parse_response(
+        self,
+        content: str,
+        original_sentence: str,
+        char_a: str,
+        char_b: str,
+        meaning_a: str,
+        meaning_b: str
+    ) -> ContextAnalysis:
+        """解析LLM的JSON响应"""
+        try:
+            # 尝试提取JSON（可能包含markdown代码块）
+            content = content.strip()
+            
+            # 如果包含```json，提取其中的JSON
+            if "```json" in content:
+                start = content.find("```json") + 7
+                end = content.find("```", start)
+                if end != -1:
+                    content = content[start:end].strip()
+            elif "```" in content:
+                # 普通代码块
+                start = content.find("```") + 3
+                end = content.find("```", start)
+                if end != -1:
+                    content = content[start:end].strip()
+            
+            # 解析JSON
+            result = json.loads(content)
+            
+            return ContextAnalysis(
+                char_a_fits=bool(result.get("char_a_fits", False)),
+                char_b_fits=bool(result.get("char_b_fits", False)),
+                char_a_interpretation=str(result.get("char_a_interpretation", "")),
+                char_b_interpretation=str(result.get("char_b_interpretation", "")),
+                conclusion=str(result.get("conclusion", "不确定")),
+                reasoning=str(result.get("reasoning", ""))
+            )
+            
+        except json.JSONDecodeError as e:
+            # JSON解析失败，尝试从文本中提取信息
+            print(f"⚠️  JSON解析失败: {e}")
+            print(f"原始响应: {content[:200]}...")
+            
+            # 尝试从文本中提取关键信息
+            conclusion = "不确定"
+            if "支持假借" in content:
+                conclusion = "支持假借"
+            elif "支持语义" in content:
+                conclusion = "支持语义"
+            
+            return ContextAnalysis(
+                char_a_fits="不通" not in content and "不通顺" not in content,
+                char_b_fits="通顺" in content or "通" in content,
+                char_a_interpretation=f"用'{meaning_a}'理解：{content[:100]}",
+                char_b_interpretation=f"用'{meaning_b}'理解：{content[:100]}",
+                conclusion=conclusion,
+                reasoning=content[:200]
+            )
     
     def _build_prompt(
         self,
