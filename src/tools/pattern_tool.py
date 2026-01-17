@@ -250,7 +250,8 @@ class PatternTool:
                 continue
             
             config = self.patterns[name]
-            match = config["compiled"].match(sentence)
+            # 使用search而不是match，因为有些模式可能不在开头
+            match = config["compiled"].search(sentence)
             
             if match:
                 groups = match.groups()
@@ -261,6 +262,19 @@ class PatternTool:
                 # 清理提取的字符
                 char_a = self._clean_char(char_a)
                 char_b = self._clean_char(char_b)
+                
+                # 对于"A也"格式，需要特殊处理
+                if name == "A也":
+                    # 提取第一个字作为被释字
+                    if not char_a:
+                        char_a = self._extract_first_char(sentence)
+                    # 提取"也"前面的内容作为释字
+                    if not char_b:
+                        # 匹配"X，Y也"格式
+                        match_a_ye = re.search(r"^([^，,]+)[，,]\s*(.+?)也$", sentence)
+                        if match_a_ye:
+                            char_a = match_a_ye.group(1).strip()
+                            char_b = match_a_ye.group(2).strip()
                 
                 return PatternResult(
                     pattern_name=name,

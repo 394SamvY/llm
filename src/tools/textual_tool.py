@@ -2,10 +2,11 @@
 文献检索工具 - 第三步：异文与文例佐证
 
 功能：检索文献中是否存在异文、平行文本等佐证
-数据源：《汉语大词典》例句、其他文献数据库
+数据源：《汉语大词典》例句、假借标注
 """
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
+import re
 
 
 @dataclass
@@ -22,7 +23,7 @@ class TextualTool:
     """
     文献检索工具类
     
-    负责人：成员C（或成员B）
+    从《汉语大词典》提取假借标注和例句作为佐证
     
     使用方法：
         tool = TextualTool()
@@ -30,32 +31,61 @@ class TextualTool:
         print(result.has_evidence)  # True
     """
     
-    def __init__(self, dictionary_path: Optional[str] = None):
+    def __init__(self, jsonl_path: Optional[str] = None, index_path: Optional[str] = None):
         """
         初始化工具
         
         Args:
-            dictionary_path: 词典数据路径
+            jsonl_path: 词典JSONL文件路径
+            index_path: 索引文件路径
         """
-        self.dictionary_path = dictionary_path
+        from ..data.dyhdc_index_builder import DYHDCIndexLoader
+        from ..config import get_settings
+        
+        settings = get_settings()
+        
+        # 设置默认路径
+        if jsonl_path is None:
+            jsonl_path = str(settings.dyhdc_path)
+        
+        if index_path is None:
+            index_path = str(settings.data_processed_dir / "dyhdc_index.json")
+        
+        self.jsonl_path = jsonl_path
+        self.index_path = index_path
+        self._loader: Optional[DYHDCIndexLoader] = None
         self._loaded = False
-        self._evidence_db: Dict[str, List[Dict]] = {}
     
     def load(self) -> None:
         """
-        加载数据
+        加载词典索引
         
-        TODO: 实现此方法
-        - 从《汉语大词典》提取假借/异文相关记录
-        - 建立检索索引
+        注意：如果索引文件不存在，会提示用户先构建索引
         """
         if self._loaded:
             return
         
-        # ===== TODO: 实现数据加载 =====
+        from ..data.dyhdc_index_builder import DYHDCIndexLoader
+        from pathlib import Path
         
-        # 临时：使用预设的异文数据
-        self._evidence_db = self._get_mock_data()
+        # 检查索引文件是否存在
+        index_path_obj = Path(self.index_path)
+        if not index_path_obj.exists():
+            raise FileNotFoundError(
+                f"索引文件不存在: {self.index_path}\n"
+                f"请先运行以下命令构建索引：\n"
+                f"  python -c \"from src.data.dyhdc_index_builder import build_dyhdc_index; build_dyhdc_index()\"\n"
+                f"或运行: python check_and_build_index.py"
+            )
+        
+        self._loader = DYHDCIndexLoader(self.jsonl_path, self.index_path)
+        if not self._loader.load_index():
+            raise RuntimeError(
+                f"索引加载失败。请检查：\n"
+                f"  1. 索引文件是否存在: {self.index_path}\n"
+                f"  2. JSONL文件是否存在: {self.jsonl_path}\n"
+                f"  3. 索引文件格式是否正确"
+            )
         self._loaded = True
     
     def search(
@@ -66,6 +96,8 @@ class TextualTool:
     ) -> TextualEvidence:
         """
         检索两个字之间的文献佐证
+        
+        从词典中提取假借标注和例句
         
         Args:
             char_a: 被释字
@@ -78,25 +110,80 @@ class TextualTool:
         if not self._loaded:
             self.load()
         
-        # 构建检索键
-        key = f"{char_a}-{char_b}"
-        reverse_key = f"{char_b}-{char_a}"
+        if self._loader is None:
+            return TextualEvidence(
+                has_evidence=False,
+                variant_texts=[],
+                parallel_texts=[],
+                jiajie_records=[],
+                summary="词典未加载"
+            )
         
         variant_texts = []
         parallel_texts = []
         jiajie_records = []
         
-        # 查找正向和反向的记录
-        for k in [key, reverse_key]:
-            if k in self._evidence_db:
-                records = self._evidence_db[k]
-                for record in records:
-                    if record["type"] == "variant":
-                        variant_texts.append(record)
-                    elif record["type"] == "parallel":
-                        parallel_texts.append(record)
-                    elif record["type"] == "jiajie":
-                        jiajie_records.append(record)
+        # 查询两个字的词典条目
+        entry_a = self._loader.query_single_char(char_a)
+        entry_b = self._loader.query_single_char(char_b)
+        
+        # 从被释字的假借标注中查找
+        if entry_a:
+            jiajie_notes = entry_a.get("假借标注", [])
+            for note in jiajie_notes:
+                # 检查是否包含释字
+                if char_b in note:
+                    # 提取出处信息
+                    source = self._extract_source(note)
+                    jiajie_records.append({
+                        "type": "jiajie",
+                        "source": source,
+                        "text": note,
+                        "note": f"词典中标注：{char_a}与{char_b}的假借关系"
+                    })
+        
+        # 从释字的假借标注中查找（反向）
+        if entry_b:
+            jiajie_notes = entry_b.get("假借标注", [])
+            for note in jiajie_notes:
+                if char_a in note:
+                    source = self._extract_source(note)
+                    jiajie_records.append({
+                        "type": "jiajie",
+                        "source": source,
+                        "text": note,
+                        "note": f"词典中标注：{char_b}与{char_a}的假借关系"
+                    })
+        
+        # 从例句中查找异文（如果上下文提供）
+        if context:
+            # 在例句中查找包含上下文的例子
+            if entry_a:
+                examples = entry_a.get("例句", [])
+                for ex in examples:
+                    ex_text = ex if isinstance(ex, str) else ex.get("text", "")
+                    if context in ex_text or char_b in ex_text:
+                        variant_texts.append({
+                            "type": "variant",
+                            "source": "《汉语大词典》例句",
+                            "text": ex_text,
+                            "note": f"例句中包含相关用字"
+                        })
+        
+        # 检查是否有"通"、"读为"等假借术语
+        if entry_a:
+            meanings = entry_a.get("义项", [])
+            for meaning in meanings:
+                # 查找包含假借术语的义项
+                if any(term in meaning for term in ["通", "读为", "读曰", "假借"]):
+                    if char_b in meaning:
+                        source = self._extract_source(meaning)
+                        jiajie_records.append({
+                            "type": "jiajie",
+                            "source": source or "《汉语大词典》",
+                            "text": meaning,
+                            "note": f"义项中标注假借关系"
+                        })
         
         has_evidence = len(variant_texts) > 0 or len(jiajie_records) > 0
         
@@ -119,42 +206,14 @@ class TextualTool:
             summary="；".join(summary_parts)
         )
     
-    def _get_mock_data(self) -> Dict[str, List[Dict]]:
-        """
-        返回测试用的假数据
-        """
-        return {
-            "崇-终": [
-                {
-                    "type": "variant",
-                    "source": "《诗·邶风·简兮》与《小雅·采绿》",
-                    "text": "崇朝 vs 终朝",
-                    "note": "同一词义，不同字形，直接证明正借关系"
-                },
-                {
-                    "type": "jiajie",
-                    "source": "《毛传》",
-                    "text": "崇，终也",
-                    "note": "训诂家直接标注"
-                }
-            ],
-            "高-膏": [
-                {
-                    "type": "jiajie",
-                    "source": "《黄帝内经》王冰注",
-                    "text": "高，膏也",
-                    "note": "高梁之变→膏粱之变"
-                }
-            ],
-            "虹-江": [
-                {
-                    "type": "jiajie",
-                    "source": "《诗·邶风·泉水》《毛传》",
-                    "text": "虹，江也（以正字义释借字）",
-                    "note": "实虹小子→实江小子"
-                }
-            ],
-        }
+    def _extract_source(self, text: str) -> str:
+        """从文本中提取出处信息"""
+        # 尝试提取《书名》格式的出处
+        pattern = r"《[^》]+》"
+        matches = re.findall(pattern, text)
+        if matches:
+            return matches[0]
+        return ""
 
 
 # ===== 函数式接口 =====

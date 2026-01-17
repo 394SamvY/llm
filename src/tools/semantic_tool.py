@@ -2,10 +2,11 @@
 语义查询工具 - 第一步：语义关联性分析
 
 功能：查询汉字的本义、义项、例句等信息
-数据源：《汉语大词典》JSONL
+数据源：《汉语大词典》JSONL，使用DYHDCIndexLoader
 """
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
+from pathlib import Path
 
 
 @dataclass
@@ -23,43 +24,71 @@ class SemanticTool:
     """
     语义查询工具类
     
-    负责人：成员B
+    使用DYHDCIndexLoader查询《汉语大词典》
     
     使用方法：
         tool = SemanticTool()
         result = tool.query("崇")
-        print(result.primary_meaning)  # "高大"
+        print(result.primary_meaning)  # "高；高大。"
     """
     
-    def __init__(self, dictionary_path: Optional[str] = None):
+    def __init__(self, jsonl_path: Optional[str] = None, index_path: Optional[str] = None):
         """
         初始化工具
         
         Args:
-            dictionary_path: 汉语大词典JSONL文件路径，默认从配置读取
+            jsonl_path: 汉语大词典JSONL文件路径，默认从配置读取
+            index_path: 索引文件路径，默认从配置读取
         """
-        self.dictionary_path = dictionary_path
-        self._index: Dict[str, Any] = {}  # 字 -> 条目的索引
+        from ..data.dyhdc_index_builder import DYHDCIndexLoader
+        from ..config import get_settings
+        
+        settings = get_settings()
+        
+        # 设置默认路径
+        if jsonl_path is None:
+            jsonl_path = str(settings.dyhdc_path)
+        
+        if index_path is None:
+            index_path = str(settings.data_processed_dir / "dyhdc_index.json")
+        
+        self.jsonl_path = jsonl_path
+        self.index_path = index_path
+        self._loader: Optional[DYHDCIndexLoader] = None
         self._loaded = False
     
     def load(self) -> None:
         """
-        加载字典数据并建立索引
+        加载字典索引
         
-        TODO: 实现此方法
-        - 读取JSONL文件
-        - 建立 字 -> 条目 的索引
-        - 考虑内存优化（延迟加载/分块加载）
+        首次调用时会加载索引（约1秒）
+        
+        注意：如果索引文件不存在，会提示用户先构建索引
         """
         if self._loaded:
             return
         
-        # ===== TODO: 实现数据加载 =====
-        # from src.knowledge.dictionary_loader import load_dyhdc
-        # self._index = load_dyhdc(self.dictionary_path)
+        from ..data.dyhdc_index_builder import DYHDCIndexLoader
+        from pathlib import Path
         
-        # 临时：使用假数据
-        self._index = self._get_mock_data()
+        # 检查索引文件是否存在
+        index_path_obj = Path(self.index_path)
+        if not index_path_obj.exists():
+            raise FileNotFoundError(
+                f"索引文件不存在: {self.index_path}\n"
+                f"请先运行以下命令构建索引：\n"
+                f"  python -c \"from src.data.dyhdc_index_builder import build_dyhdc_index; build_dyhdc_index()\"\n"
+                f"或运行: python check_and_build_index.py"
+            )
+        
+        self._loader = DYHDCIndexLoader(self.jsonl_path, self.index_path)
+        if not self._loader.load_index():
+            raise RuntimeError(
+                f"索引加载失败。请检查：\n"
+                f"  1. 索引文件是否存在: {self.index_path}\n"
+                f"  2. JSONL文件是否存在: {self.jsonl_path}\n"
+                f"  3. 索引文件格式是否正确"
+            )
         self._loaded = True
     
     def query(self, char: str) -> WordMeaning:
@@ -67,7 +96,7 @@ class SemanticTool:
         查询单个汉字的语义信息
         
         Args:
-            char: 要查询的汉字
+            char: 要查询的汉字（支持繁简体）
             
         Returns:
             WordMeaning: 包含本义、义项、例句等信息
@@ -75,17 +104,19 @@ class SemanticTool:
         if not self._loaded:
             self.load()
         
-        if char in self._index:
-            data = self._index[char]
+        if self._loader is None:
             return WordMeaning(
                 char=char,
-                primary_meaning=data.get("primary_meaning", "未知"),
-                meanings=data.get("meanings", []),
-                examples=data.get("examples", []),
-                jiajie_notes=data.get("jiajie_notes", []),
-                raw_data=data
+                primary_meaning="未加载",
+                meanings=[],
+                examples=[],
+                jiajie_notes=[]
             )
-        else:
+        
+        # 查询词典
+        result = self._loader.query_single_char(char)
+        
+        if result is None:
             return WordMeaning(
                 char=char,
                 primary_meaning="未收录",
@@ -93,59 +124,24 @@ class SemanticTool:
                 examples=[],
                 jiajie_notes=[]
             )
-    
-    def _get_mock_data(self) -> Dict[str, Any]:
-        """
-        返回测试用的假数据
         
-        开发时使用，正式版本删除此方法
-        """
-        return {
-            "崇": {
-                "primary_meaning": "高大",
-                "meanings": ["高大", "尊崇", "充满", "终（假借）"],
-                "examples": [
-                    {"source": "《说文》", "quote": "崇，嵬高也"},
-                    {"source": "《诗·大雅·云汉》", "quote": "瞻卬昊天，云如何崇"},
-                ],
-                "jiajie_notes": ["崇朝，终朝也。——《诗·邶风》毛传"]
-            },
-            "终": {
-                "primary_meaning": "终结",
-                "meanings": ["终结", "完整", "最终", "整个"],
-                "examples": [
-                    {"source": "《说文》", "quote": "终，絿丝也"},
-                    {"source": "《诗·小雅·采绿》", "quote": "终朝采绿"},
-                ],
-                "jiajie_notes": []
-            },
-            "海": {
-                "primary_meaning": "大海",
-                "meanings": ["大海", "大湖", "众多"],
-                "examples": [
-                    {"source": "《释名》", "quote": "海，晦也，主承秽浊，其色黑而晦也"},
-                ],
-                "jiajie_notes": []
-            },
-            "晦": {
-                "primary_meaning": "昏暗",
-                "meanings": ["昏暗", "月末", "隐晦"],
-                "examples": [],
-                "jiajie_notes": []
-            },
-            "祈": {
-                "primary_meaning": "祈求",
-                "meanings": ["祈求", "祈祷"],
-                "examples": [],
-                "jiajie_notes": []
-            },
-            "求": {
-                "primary_meaning": "寻求",
-                "meanings": ["寻求", "请求", "探求"],
-                "examples": [],
-                "jiajie_notes": []
-            },
-        }
+        # 转换例句格式
+        examples = []
+        for ex in result.get("例句", []):
+            if isinstance(ex, str):
+                # 如果是字符串，尝试解析
+                examples.append({"quote": ex})
+            elif isinstance(ex, dict):
+                examples.append(ex)
+        
+        return WordMeaning(
+            char=result.get("字", char),
+            primary_meaning=result.get("本义", "未知"),
+            meanings=result.get("义项", []),
+            examples=examples,
+            jiajie_notes=result.get("假借标注", []),
+            raw_data=result
+        )
 
 
 # ===== 函数式接口（方便直接调用）=====
