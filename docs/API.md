@@ -8,10 +8,353 @@
 
 ## 目录
 
+- [Agent 核心模块 (agent/)](#agent-核心模块-agent)
 - [数据处理模块 (data/)](#数据处理模块-data)
 - [评估模块 (evaluation/)](#评估模块-evaluation)
 - [知识库模块 (knowledge/)](#知识库模块-knowledge)
 - [工具模块 (tools/)](#工具模块-tools)
+
+---
+
+## Agent 核心模块 (agent/)
+
+### `xungu_agent.py`
+
+#### `AnalysisResult`
+
+**功能**: 分析结果数据类
+
+**字段**:
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `xungu_sentence` | str | 训诂句，如"崇，终也" |
+| `char_a` | str | 被释字 |
+| `char_b` | str | 释字 |
+| `context` | Optional[str] | 上下文，如"崇朝其雨" |
+| `source` | Optional[str] | 出处，如"《毛传》" |
+| `classification` | str | 分类结果："假借说明" 或 "语义解释" |
+| `confidence` | float | 置信度 (0.0-1.0) |
+| `step1_semantic` | Dict | 第一步：语义查询结果 |
+| `step2_phonetic` | Dict | 第二步：音韵查询结果 |
+| `step3_textual` | Dict | 第三步：文献检索结果 |
+| `step4_pattern` | Dict | 第四步：训式识别结果 |
+| `step5_context` | Dict | 第五步：语境分析结果 |
+| `final_reasoning` | str | 最终推理说明 |
+
+**方法**:
+
+##### `to_dict() -> Dict`
+
+转换为字典格式
+
+**返回**: `Dict` - 包含所有字段的字典
+
+**示例**:
+```python
+result_dict = analysis_result.to_dict()
+```
+
+##### `to_json(indent: int = 2) -> str`
+
+转换为JSON字符串
+
+**参数**:
+- `indent` (int): JSON缩进空格数
+
+**返回**: `str` - JSON格式字符串
+
+**示例**:
+```python
+json_str = analysis_result.to_json()
+print(json_str)
+```
+
+---
+
+#### `XunguAgent`
+
+**功能**: 基于LangChain的训诂分类Agent核心类
+
+**方法**:
+
+##### `__init__(llm_provider: Optional[str] = None, verbose: bool = True, max_iterations: int = 15, max_execution_time: Optional[int] = None) -> None`
+
+初始化Agent
+
+**参数**:
+- `llm_provider` (str, optional): LLM提供商，"openai" 或 "anthropic"，默认从配置自动选择
+- `verbose` (bool): 是否输出详细日志，默认 True
+- `max_iterations` (int): 最大迭代次数（工具调用次数），默认 15
+- `max_execution_time` (int, optional): 最大执行时间（秒），默认无限制
+
+**示例**:
+```python
+from src.agent import XunguAgent
+
+# 使用默认配置
+agent = XunguAgent(verbose=True)
+
+# 指定提供商
+agent = XunguAgent(llm_provider="openai", verbose=True)
+
+# 设置时间限制
+agent = XunguAgent(max_execution_time=60)
+```
+
+---
+
+##### `analyze(xungu_sentence: str, context: Optional[str] = None, source: Optional[str] = None) -> AnalysisResult`
+
+分析训诂句，执行完整的五步推理流程
+
+**参数**:
+- `xungu_sentence` (str): 训诂句，如 "崇，终也"
+- `context` (str, optional): 上下文，如 "崇朝其雨"
+- `source` (str, optional): 出处，如 "《毛传》"
+
+**返回**: `AnalysisResult` - 完整的分析结果
+
+**五步推理流程**:
+1. **语义查询** - 查询被释字和释字的本义，判断义近/义远
+2. **音韵查询** - 查询上古音信息，判断音近关系
+3. **文献检索** - 检索异文、假借记录等佐证
+4. **训式识别** - 识别训诂句的格式，判断直接暗示
+5. **语境分析** - 分析语境适配度，判断本义代入后是否通顺
+
+**示例**:
+```python
+from src.agent import XunguAgent
+
+agent = XunguAgent(verbose=True)
+
+# 基础分析
+result = agent.analyze("崇，终也")
+print(f"分类: {result.classification}")  # "假借说明"
+print(f"置信度: {result.confidence}")    # 0.85
+
+# 带上下文分析
+result = agent.analyze(
+    xungu_sentence="崇，终也",
+    context="崇朝其雨",
+    source="《毛传》"
+)
+print(result.to_json())
+
+# 查看详细推理过程
+print(result.step1_semantic)   # 第一步语义分析
+print(result.step2_phonetic)   # 第二步音韵分析
+print(result.step3_textual)    # 第三步文献分析
+print(result.step4_pattern)    # 第四步训式分析
+print(result.step5_context)    # 第五步语境分析
+```
+
+---
+
+### `llm_client.py`
+
+#### `get_llm(provider: Optional[str] = None) -> Union[ChatOpenAI, ChatAnthropic]`
+
+获取LLM客户端
+
+**参数**:
+- `provider` (str, optional): "openai" 或 "anthropic"，默认从配置自动选择
+
+**返回**: LLM客户端实例
+
+**异常**:
+- `ValueError`: 如果API Key未设置或provider无效
+
+**支持的LLM**:
+- OpenAI GPT-4 系列
+- Anthropic Claude 系列
+
+**示例**:
+```python
+from src.agent.llm_client import get_llm
+
+# 使用默认配置（从env或.env读取）
+llm = get_llm()
+
+# 指定OpenAI
+llm = get_llm(provider="openai")
+
+# 指定Anthropic
+llm = get_llm(provider="anthropic")
+```
+
+**环境变量要求**:
+- OpenAI: `OPENAI_API_KEY`、`LLM_MODEL`（可选）
+- Anthropic: `ANTHROPIC_API_KEY`
+
+---
+
+### `tool_wrappers.py`
+
+#### `get_all_tools() -> List[StructuredTool]`
+
+获取所有包装后的工具列表
+
+**返回**: `List[StructuredTool]` - LangChain格式的工具列表
+
+**包含的工具**:
+1. `query_word_meaning` - 语义查询工具
+2. `query_phonology` - 音韵查询工具
+3. `check_phonetic_relation` - 音韵关系判断工具
+4. `search_textual_evidence` - 文献检索工具
+5. `identify_pattern` - 训式识别工具
+6. `analyze_context` - 语境分析工具
+
+**示例**:
+```python
+from src.agent.tool_wrappers import get_all_tools
+
+tools = get_all_tools()
+print(f"可用工具数量: {len(tools)}")
+for tool in tools:
+    print(f"- {tool.name}: {tool.description[:50]}...")
+```
+
+---
+
+### `prompts.py`
+
+#### `SYSTEM_PROMPT`
+
+**类型**: str
+
+**说明**: Agent的系统提示词，定义了Agent的角色、任务、五步推理流程等
+
+**包含内容**:
+- Agent角色定义
+- 五步推理流程说明
+- 工具使用指引
+- 输出格式要求
+
+**示例**:
+```python
+from src.agent.prompts import SYSTEM_PROMPT
+
+print(SYSTEM_PROMPT)
+```
+
+---
+
+#### `REASONING_PROMPT`
+
+**类型**: str
+
+**说明**: 推理提示词，用于引导Agent进行深度分析
+
+**示例**:
+```python
+from src.agent.prompts import REASONING_PROMPT
+
+print(REASONING_PROMPT)
+```
+
+---
+
+### 便捷函数
+
+#### `analyze(xungu_sentence: str, context: Optional[str] = None, source: Optional[str] = None, llm_provider: Optional[str] = None, verbose: bool = False) -> Dict[str, Any]`
+
+分析训诂句的便捷函数（直接返回字典）
+
+**参数**:
+- `xungu_sentence` (str): 训诂句
+- `context` (str, optional): 上下文
+- `source` (str, optional): 出处
+- `llm_provider` (str, optional): LLM提供商
+- `verbose` (bool): 是否输出详细日志，默认 False
+
+**返回**: `Dict[str, Any]` - 分析结果字典
+
+**示例**:
+```python
+from src.agent import analyze
+
+# 简单使用
+result = analyze("崇，终也", context="崇朝其雨")
+print(result["classification"])
+print(result["confidence"])
+print(result["final_reasoning"])
+
+# 批量处理
+results = []
+for sentence in ["崇，终也", "鬼，隐也"]:
+    result = analyze(sentence)
+    results.append(result)
+```
+
+---
+
+### 导出接口
+
+从 `src.agent` 模块可以直接导入以下内容：
+
+```python
+from src.agent import (
+    # 核心类
+    XunguAgent,
+    AnalysisResult,
+    
+    # 便捷函数
+    analyze,
+    
+    # Prompt
+    SYSTEM_PROMPT,
+    REASONING_PROMPT,
+    
+    # 工具相关
+    get_llm,
+    get_all_tools,
+)
+```
+
+---
+
+## 完整使用示例
+
+### 最简单的用法
+
+```python
+from src.agent import analyze
+
+result = analyze("崇，终也", context="崇朝其雨")
+print(result["classification"])  # "假借说明"
+```
+
+### 完整的用法
+
+```python
+from src.agent import XunguAgent
+
+# 创建Agent
+agent = XunguAgent(llm_provider="openai", verbose=True)
+
+# 分析
+result = agent.analyze(
+    xungu_sentence="崇，终也",
+    context="崇朝其雨",
+    source="《毛传》"
+)
+
+# 访问结果
+print(f"分类: {result.classification}")
+print(f"置信度: {result.confidence:.0%}")
+
+# 查看五步推理
+print(f"第一步语义: {result.step1_semantic}")
+print(f"第二步音韵: {result.step2_phonetic}")
+print(f"第三步文献: {result.step3_textual}")
+print(f"第四步训式: {result.step4_pattern}")
+print(f"第五步语境: {result.step5_context}")
+
+# 导出为JSON
+json_output = result.to_json()
+print(json_output)
+```
 
 ---
 
