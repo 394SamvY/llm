@@ -537,9 +537,133 @@ class Settings:
 
 ---
 
+## 📦 数据资源利用方案
+
+### MDX资源处理策略
+
+项目涉及多种MDX格式的古汉语词典资源：
+- 《王力古汉语字典》（5.5MB）
+- 上古音MDX数据
+
+**采用的方案：预处理+索引**
+
+```
+原始资源                    预处理                      运行时检索
+────────────────────────────────────────────────────────────────────
+《汉语大词典》JSONL ──────→ dyhdc_index.json ────────→ 偏移量快速定位
+      (1.9GB)                (27,678首字)               O(1)查询
+
+潘悟云TXT/白一平XLSX ─────→ phonology_unified.json ──→ 字典直接查询
+     (多文件)                (13,666字)                 O(1)查询
+```
+
+**为什么不直接解析MDX？**
+
+1. **性能考虑**：MDX是压缩格式，每次查询都解压效率低
+2. **已有替代**：《汉语大词典》已有JSONL格式，数据更完整
+3. **简化依赖**：避免引入MDX解析库的兼容性问题
+
+**MDX可扩展方案**：
+
+如需支持MDX直接查询，可安装 `readmdict` 库并实现 `src/data/mdx_parser.py`：
+
+```python
+# 预留接口
+from readmdict import MDX
+def query_mdx(mdx_path: str, keyword: str) -> str:
+    mdx = MDX(mdx_path)
+    return mdx.lookup(keyword)
+```
+
+---
+
+## 🔍 检索架构设计
+
+### 精确索引 vs 向量检索
+
+本系统采用**基于索引的精确检索**而非向量检索：
+
+| 特性 | 精确索引（本项目） | 向量检索 |
+|------|-------------------|----------|
+| 查询方式 | 字→偏移量→条目 | 语义相似度匹配 |
+| 适用场景 | 单字/词精确查询 | 模糊语义检索 |
+| 查询速度 | O(1)，毫秒级 | 较慢，需计算相似度 |
+| 资源占用 | 索引文件~50MB | 需要向量数据库 |
+| 准确性 | 100%精确 | 可能有误差 |
+
+**选择精确索引的理由：**
+
+1. **场景适配**：训诂分析是单字查询，不需要语义搜索
+2. **性能优先**：1.9GB词典通过索引实现毫秒级查询
+3. **简化部署**：无需额外的向量数据库服务
+
+### 索引结构
+
+```json
+// dyhdc_index.json 结构
+{
+  "stats": {
+    "total_chars": 27678,
+    "total_entries": 408931
+  },
+  "index": {
+    "崇": [
+      {"headword": "崇", "offset": 12345, "length": 2048},
+      {"headword": "崇拜", "offset": 14393, "length": 1024}
+    ],
+    "终": [...]
+  }
+}
+```
+
+### 向量检索扩展（预留）
+
+如需支持语义检索，可引入 ChromaDB：
+
+```python
+# 预留接口 - src/knowledge/vector_store.py
+import chromadb
+
+class VectorStore:
+    def __init__(self):
+        self.client = chromadb.Client()
+        self.collection = self.client.create_collection("xungu")
+    
+    def search(self, query: str, top_k: int = 5):
+        """语义检索相关训诂案例"""
+        return self.collection.query(query_texts=[query], n_results=top_k)
+```
+
+---
+
+## 📊 系统性能评估
+
+### 评估结果摘要
+
+| 指标 | 数值 |
+|------|------|
+| 测试数据集 | 60条 |
+| **准确率** | **86.67%** |
+| **宏平均F1** | **84.60%** |
+| 假借说明F1 | 78.95% |
+| 语义解释F1 | 90.24% |
+
+### 资源覆盖率
+
+| 资源 | 条目数 | 覆盖率 |
+|------|--------|--------|
+| 《汉语大词典》索引 | 408,931条 | >99%字覆盖 |
+| 音韵数据 | 13,666字 | >95%常用字 |
+| 训式规则 | 25+种模式 | 覆盖主要训式 |
+
+详细评估报告见 [EVALUATION_REPORT.md](EVALUATION_REPORT.md)
+
+---
+
 ## 🔗 相关文档
 
 - [快速开始](QUICK_START.md)
+- [评估报告](EVALUATION_REPORT.md)
 - [任务要求](TASK_REQUIREMENTS.md)
 - [实现指南](IMPLEMENTATION_GUIDE.md)
 - [开发计划](DEVELOPMENT_PLAN.md)

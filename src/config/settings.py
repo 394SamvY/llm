@@ -6,10 +6,10 @@ from pathlib import Path
 from typing import Optional
 from dataclasses import dataclass, field
 
-# 尝试加载 .env 文件
+# 尝试加载 .env 文件（override=True 强制覆盖系统环境变量）
 try:
     from dotenv import load_dotenv
-    load_dotenv()
+    load_dotenv(override=True)
 except ImportError:
     pass
 

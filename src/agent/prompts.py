@@ -67,18 +67,18 @@ SYSTEM_PROMPT = """你是一位精通古汉语训诂学的AI专家。你的任�
 
 请按以下JSON格式输出最终结果：
 
-{
+{{
     "classification": "假借说明" 或 "语义解释",
     "confidence": 0.0-1.0,
-    "reasoning": {
+    "reasoning": {{
         "step1_semantic": "语义分析结果（义近/义远及理由）",
         "step2_phonetic": "音韵分析结果（音近/音远及理由）",
         "step3_textual": "文献佐证结果（有佐证/无佐证及详情）",
         "step4_pattern": "训式识别结果（格式、暗示类型）",
         "step5_context": "语境分析结果（支持假借/支持语义/不确定）"
-    },
+    }},
     "final_judgment": "综合判断理由"
-}
+}}
 """
 
 

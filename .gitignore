@@ -17,14 +17,19 @@ ENV/
 .DS_Store
 
 # ===== 项目相关 =====
-.env
+# .env  # 已提交供老师验证
 *.log
 logs/
 
-# ===== 数据文件（太大不上传）=====
+# ===== 数据文件 =====
 data/raw/
-data/processed/*.json
 data/processed/*.pkl
+# 保留必需的索引文件（系统运行依赖）
+!data/processed/dyhdc_index.json
+!data/processed/phonology_unified.json
+# 忽略运行产物
+data/processed/evaluation_results.json
+data/processed/error_analysis_sample.json
 
 # 大文件（超过GitHub 100MB限制）
 《汉语大词典》结构化/dyhdc.parsed.fixed.v2.jsonl

@@ -5,9 +5,6 @@
     # 单条分析
     python -m src.main --input "崇，终也" --context "崇朝其雨"
     
-    # 交互模式
-    python -m src.main --interactive
-    
     # 批量处理
     python -m src.main --batch data/test/test_dataset.json --output results.json
     
@@ -32,44 +29,6 @@ def analyze_single(
     agent = XunguAgent(verbose=verbose)
     result = agent.analyze(xungu_sentence, context, source)
     return result.to_dict()
-
-
-def interactive_mode():
-    """交互模式"""
-    print("\n" + "=" * 60)
-    print("训诂句类型智能判断系统")
-    print("=" * 60)
-    print("输入训诂句进行分析，输入 'quit' 退出\n")
-    
-    agent = XunguAgent(verbose=True)
-    
-    while True:
-        try:
-            xungu_sentence = input("请输入训诂句: ").strip()
-            if xungu_sentence.lower() in ['quit', 'exit', 'q']:
-                print("再见！")
-                break
-            
-            if not xungu_sentence:
-                continue
-            
-            context = input("请输入上下文（可选，直接回车跳过）: ").strip() or None
-            source = input("请输入出处（可选，直接回车跳过）: ").strip() or None
-            
-            result = agent.analyze(xungu_sentence, context, source)
-            
-            print("\n" + "-" * 40)
-            print("分析结果:")
-            print(f"  分类: {result.classification}")
-            print(f"  置信度: {result.confidence:.0%}")
-            print(f"  理由: {result.final_reasoning}")
-            print("-" * 40 + "\n")
-            
-        except KeyboardInterrupt:
-            print("\n再见！")
-            break
-        except Exception as e:
-            print(f"错误: {e}")
 
 
 def batch_process(input_file: str, output_file: str):
@@ -101,7 +60,7 @@ def batch_process(input_file: str, output_file: str):
 def run_evaluation():
     """运行评估"""
     print("加载测试数据集...")
-    dataset = load_test_dataset()
+    dataset = load_test_dataset("data/test/test_dataset.json")
     
     print(f"共 {len(dataset)} 条测试数据")
     
@@ -132,7 +91,6 @@ def main():
         epilog="""
 示例:
   python -m src.main --input "崇，终也" --context "崇朝其雨"
-  python -m src.main --interactive
   python -m src.main --evaluate
         """
     )
@@ -151,11 +109,6 @@ def main():
         "--source", "-s",
         type=str,
         help="出处"
-    )
-    parser.add_argument(
-        "--interactive",
-        action="store_true",
-        help="交互模式"
     )
     parser.add_argument(
         "--batch", "-b",
@@ -181,9 +134,7 @@ def main():
     
     args = parser.parse_args()
     
-    if args.interactive:
-        interactive_mode()
-    elif args.batch:
+    if args.batch:
         batch_process(args.batch, args.output)
     elif args.evaluate:
         run_evaluation()
