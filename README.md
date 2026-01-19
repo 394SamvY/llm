@@ -39,6 +39,13 @@ TEST_CASES = [
 2. 运行测试：
 
 ```bash
+#  创建虚拟环境
+python3 -m venv venv
+source venv/bin/activate
+
+#  安装依赖
+pip install -r requirements.txt
+
 python test_for_teacher.py
 ```
 
