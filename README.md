@@ -21,40 +21,47 @@
 
 ## 🧪 教师测试入口
 
-### 方式一：使用测试脚本（推荐）
+### 方式一：使用JSON文件测试（推荐）
 
-1. 编辑 `test_for_teacher.py`，在 `TEST_CASES` 列表中添加测试用例：
+1. 准备测试文件 `my_test.json`：
 
-```python
-TEST_CASES = [
-    {
-        "训诂句": "崇，终也",
-        "上下文": "崇朝其雨",  # 可选
-        "出处": "《毛传》",     # 可选
-    },
-    # 添加更多...
+```json
+[
+    {"训诂句": "崇，终也", "上下文": "崇朝其雨", "出处": "《毛传》"},
+    {"训诂句": "海，晦也", "上下文": null, "出处": "《释名》"},
+    {"训诂句": "正，读为征", "上下文": "正其货贿", "出处": "《周礼》郑注"}
 ]
 ```
 
 2. 运行测试：
 
 ```bash
-#  创建虚拟环境
+# 创建虚拟环境并安装依赖
 python3 -m venv venv
 source venv/bin/activate
-
-#  安装依赖
 pip install -r requirements.txt
 
+# 使用自定义测试集
+python test_for_teacher.py my_test.json
+
+# 或使用内置示例（3条）
 python test_for_teacher.py
 ```
 
-3. 查看结果：终端输出 + JSON文件
+3. 查看结果：
+   - 终端实时输出分类结果
+   - 详细报告自动保存到 `teacher_test_results_*.json`
 
 ### 方式二：命令行单条测试
 
 ```bash
-python -m src.main --input "训诂句内容" --context "上下文" --verbose
+python -m src.main --input "崇，终也" --context "崇朝其雨" --verbose
+```
+
+### 方式三：完整评估（60条测试集）
+
+```bash
+python -m src.main --evaluate
 ```
 
 ---
